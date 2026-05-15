@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lab 29 — Python Security Automation | RouteToRoot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --surface: #111820;
+      --border: #1e2d3d;
+      --accent: #00aaff;
+      --accent2: #00ff99;
+      --warn: #ffaa00;
+      --text: #cdd9e5;
+      --muted: #546e7a;
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-ui: 'Rajdhani', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+    }
+
+    header .logo {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent2);
+      letter-spacing: 0.05em;
+    }
+
+    header nav a {
+      margin-left: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    header nav a:hover { color: var(--accent); text-decoration: none; }
+
+    .hero {
+      padding: 3.5rem 2rem 2rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .lab-badge {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent2);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 2rem;
+      font-family: var(--font-mono);
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .meta-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.3rem 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .meta-pill span { color: var(--accent); }
+
+    section {
+      max-width: 960px;
+      margin: 0 auto 3rem;
+      padding: 0 2rem;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .sev-info {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      background: #0d2137;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    .sev-medium {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      background: #1f1500;
+      color: var(--warn);
+      border: 1px solid var(--warn);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+    }
+
+    .stat-card .number {
+      font-family: var(--font-mono);
+      font-size: 2rem;
+      color: var(--accent2);
+      display: block;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-card .label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .screenshot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .screenshot-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .screenshot-card img {
+      width: 100%;
+      display: block;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .screenshot-card .caption {
+      padding: 0.6rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .analysis-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent2);
+      border-radius: 4px;
+      padding: 1.25rem 1.5rem;
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--text);
+    }
+
+    .analysis-block p { margin-bottom: 0.75rem; }
+    .analysis-block p:last-child { margin-bottom: 0; }
+
+    .analysis-block ul {
+      padding-left: 1.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .analysis-block li { margin-bottom: 0.35rem; }
+
+    .outcome-box {
+      background: #0a1f12;
+      border: 1px solid #1a4d2e;
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      color: var(--accent2);
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    footer a { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">[ RouteToRoot ]</div>
+  <nav>
+    <a href="https://routetoroot.github.io">Home</a>
+    <a href="https://github.com/RouteToRoot">GitHub</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="lab-badge">// SOC Portfolio — Lab 29</div>
+  <h1>Python <span>Security</span> Automation</h1>
+  <p class="subtitle">Three SOC automation scripts built in Python 3 — log parsing, IP reputation lookup, and triage report generation</p>
+  <div class="meta-row">
+    <div class="meta-pill">Date: <span>May 12, 2026</span></div>
+    <div class="meta-pill">Language: <span>Python 3.11.9</span></div>
+    <div class="meta-pill">Platform: <span>Kali Linux</span></div>
+    <div class="meta-pill">API: <span>AbuseIPDB v2</span></div>
+    <div class="meta-pill">Scripts: <span>3</span></div>
+  </div>
+</div>
+
+<section>
+  <h2>Lab Summary</h2>
+  <div class="stat-grid">
+    <div class="stat-card"><span class="number">3</span><span class="label">Scripts Built</span></div>
+    <div class="stat-card"><span class="number">6</span><span class="label">Failed Logins Detected</span></div>
+    <div class="stat-card"><span class="number">3</span><span class="label">Source IPs Identified</span></div>
+    <div class="stat-card"><span class="number">1</span><span class="label">API Integrated</span></div>
+    <div class="stat-card"><span class="number">4</span><span class="label">Accounts Targeted</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Environment</h2>
+  <table>
+    <thead><tr><th>Field</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>Platform</td><td>Kali Linux (VMware Workstation)</td></tr>
+      <tr><td>Language</td><td>Python 3.11.9</td></tr>
+      <tr><td>Editor</td><td>GNU nano 8.1</td></tr>
+      <tr><td>Log File</td><td>auth.log (simulated SSH authentication log)</td></tr>
+      <tr><td>External API</td><td>AbuseIPDB v2 — IP reputation lookup</td></tr>
+      <tr><td>Scripts</td><td>log_parser.py, ip_reputation.py, alert_summary.py</td></tr>
+      <tr><td>Working Directory</td><td>~/soc-lab-29-python</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Script 1 — Log Parser</h2>
+  <div class="analysis-block">
+    <p><strong>log_parser.py</strong> reads a simulated SSH authentication log and extracts all failed login attempts, displaying each event with full timestamp, account name, and source IP.</p>
+    <p>Key output:</p>
+    <ul>
+      <li>6 failed login attempts detected</li>
+      <li>Events from 3 unique source IPs: 192.168.1.105, 10.0.0.22, 172.16.0.55</li>
+      <li>Accounts targeted: admin (3), root (1), guest (1), test (1)</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Script 2 — IP Reputation Checker</h2>
+  <div class="analysis-block">
+    <p><strong>ip_reputation.py</strong> queries the AbuseIPDB REST API to retrieve threat intelligence on a suspicious IP address identified during log analysis.</p>
+    <p>API response fields returned:</p>
+    <ul>
+      <li>IP Address, Abuse Score, Total Reports</li>
+      <li>Country, ISP, Last Reported date</li>
+      <li>Target IP: 192.168.1.105 — private RFC 1918 address, 0% abuse score (expected)</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Script 3 — Alert Summary Report</h2>
+  <div class="analysis-block">
+    <p><strong>alert_summary.py</strong> combines log parsing and IP analysis into a formatted SOC triage report, automatically ranking offending accounts by attempt count and generating recommended containment actions.</p>
+    <p>Report output included:</p>
+    <ul>
+      <li>Timestamp, log file, and total failed login count</li>
+      <li>Top offending accounts ranked by attempt count</li>
+      <li>Recommended actions: firewall block, Tier 2 escalation, lockout policy review</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Findings</h2>
+  <table>
+    <thead><tr><th>Account</th><th>Failed Attempts</th><th>Source IPs</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>admin</td><td>3</td><td>192.168.1.105, 10.0.0.22</td><td><span class="sev-medium">ESCALATE</span></td></tr>
+      <tr><td>root</td><td>1</td><td>192.168.1.105</td><td><span class="sev-info">MONITOR</span></td></tr>
+      <tr><td>guest</td><td>1</td><td>192.168.1.105</td><td><span class="sev-info">MONITOR</span></td></tr>
+      <tr><td>test</td><td>1</td><td>10.0.0.22</td><td><span class="sev-info">MONITOR</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>MITRE ATT&amp;CK Mapping</h2>
+  <table>
+    <thead><tr><th>Field</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Tactic</td><td>Credential Access (TA0006)</td></tr>
+      <tr><td>Technique</td><td>Brute Force (T1110)</td></tr>
+      <tr><td>Sub-technique</td><td>Password Guessing (T1110.001)</td></tr>
+      <tr><td>Objective</td><td>Gain unauthorized SSH access via repeated credential attempts</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Screenshots</h2>
+  <div class="screenshot-grid">
+    <div class="screenshot-card">
+      <img src="screenshot_log_parser.png" alt="Log Parser Output"/>
+      <div class="caption">Script 1 — log_parser.py — 6 failed login attempts detected</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshot_ip_reputation.png" alt="IP Reputation Output"/>
+      <div class="caption">Script 2 — ip_reputation.py — AbuseIPDB API response for 192.168.1.105</div>
+    </div>
+    <div class="screenshot-card">
+      <img src="screenshot_alert_summary.png" alt="Alert Summary Report"/>
+      <div class="caption">Script 3 — alert_summary.py — formatted SOC triage report with recommendations</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Outcome</h2>
+  <div class="outcome-box">
+    &gt; log_parser.py — 6 failed SSH login attempts detected across 3 source IPs<br/>
+    &gt; ip_reputation.py — AbuseIPDB API integrated and queried successfully<br/>
+    &gt; alert_summary.py — triage report generated with ranked offenders and recommendations<br/>
+    &gt; Python scripting demonstrated as viable SOC automation tool<br/>
+    &gt; Lab 29 confirmed — all scripts functional on Kali Linux
+  </div>
+</section>
+
+<footer>
+  <a href="https://routetoroot.github.io">routetoroot.github.io</a> &nbsp;|&nbsp;
+  <a href="https://github.com/RouteToRoot/soc-lab-29-python-security-automation">GitHub Repo</a> &nbsp;|&nbsp;
+  Eric Ellison — SOC Portfolio
+</footer>
+
+</body>
+</html>
